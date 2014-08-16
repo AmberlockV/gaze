@@ -158,7 +158,6 @@ camgaze.Camera = function (dimX, dimY, canvasId) {
 
   var self = this;
   if (compatibility.getUserMedia) {
-    console.log("here")
     compatibility.getUserMedia(
       {
           video : true

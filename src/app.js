@@ -1,5 +1,4 @@
 $(function(){
-    console.log("loaded");
     var height = 480;
     var width = 640;
 
