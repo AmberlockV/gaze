@@ -26,10 +26,12 @@
         var eyeFilter = new camgaze.EyeFilter();
         var drawer = new camgaze.drawing.ImageDrawer();
 
+        var previous_y = null;
+        var previous_x = null;
+
         var moveGaze = function(gaze) {
           current_eye = gaze[0];
           eye_data = current_eye.centroid.unfiltered;
-
 
           eye_x = eye_data.x;
           eye_y = eye_data.y;
@@ -39,8 +41,18 @@
           y_multiplier = window_y / 480;
           x_multiplier = window_x / 640
 
-          $("#the-eye").css("top", eye_y * y_multiplier);
-          $("#the-eye").css("left", window_x - (eye_x * x_multiplier));
+          current_y = eye_y * y_multiplier;
+          current_x = window_x - (eye_x * x_multiplier);
+
+          if ( previous_x == null || (previous_x - 150) <= current_x && (previous_x + 150) >= current_x) {
+            $("#the-eye").css("left", current_x);
+            previous_x = current_x;
+          }
+
+          if ( previous_y == null || (previous_y - 150) <= current_y && (previous_y + 150) >= current_y) {
+            $("#the-eye").css("top", current_y);
+            previous_y = current_y;
+          }
         }
 
         var frameOp = function (image_data, video) {
@@ -59,7 +71,6 @@
 
           if (trackingData.eyeList.length > 0) {
             moveGaze(gazeList);
-
 
             gazeList.forEach(
               function (eye) {
@@ -101,8 +112,8 @@
   </script>
 </head>
 <body>
-  <canvas id="mainCanvas" style= "display: none;"></canvas>
+  <canvas id="mainCanvas" style="display: none;"></canvas>
   <video style="display: none;" autoplay></video>
-  <div id="the-eye" style="border: 2px solid black; background-color: black; height: 20px; width: 20px; display:block; position:absolute; top: 0px;"></div>
+  <div id="the-eye" style="border-radius: 100px; border: 2px solid black; background-color: black; height: 20px; width: 20px; display:block; position:absolute; top: 0px;"></div>
 </body>
 </html>
