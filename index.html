@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Gaze</title>
+  <!-- JQuery and Bootstrap Javascript files -->
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" ></script>
+
+  <!-- Concuss.js and Canvas utilities -->
+  <script text="text/javascript" src="build/jsfeat.js"></script>
+  <script text="text/javascript" src="build/compatibility.js"></script>
+  <script text="text/javascript" src="build/camgaze.js"></script>
+  <script text="text/javascript" src="cascades/eye.js"></script>
+  <script text="text/javascript" src="cascades/frontalface.js"></script>
+  <script text="text/javascript">
+    window.onload = function(){
+        var height = 480;
+        var width = 640;
+
+        var cGaze = new camgaze.Camgaze(
+          width,
+          height,
+          "mainCanvas"
+        );
+        var eyeTracker = new camgaze.EyeTracker(width, height);
+        var eyeFilter = new camgaze.EyeFilter();
+        var drawer = new camgaze.drawing.ImageDrawer();
+
+        var moveGaze = function(gaze) {
+          current_eye = gaze[0];
+          eye_data = current_eye.centroid.unfiltered;
+
+
+          eye_x = eye_data.x;
+          eye_y = eye_data.y;
+          window_y = $(window).height();
+          window_x = $(window).width();
+
+          y_multiplier = window_y / 480;
+          x_multiplier = window_x / 640
+
+          $("#the-eye").css("top", eye_y * y_multiplier);
+          $("#the-eye").css("left", window_x - (eye_x * x_multiplier));
+        }
+
+        var frameOp = function (image_data, video) {
+          var trackingData = eyeTracker.track(image_data, video);
+
+          var gazeList = eyeFilter.getFilteredGaze(trackingData);
+
+                    // new HAAR.Detector(haarcascade_frontalface_alt, Parallel)
+                    //                     .image(image_data) // use the image
+                    //                     .interval(30) // set detection interval for asynchronous detection (if not parallel)
+                    //                     .complete(function(){  // onComplete callback
+                    //                         console.log(this.Selection, this.objects);
+                    //                         alert(l+" Objects found");
+                    //                     })
+                    //                     .detect(1, 1.25, 0.1, 1, true); // go
+
+          if (trackingData.eyeList.length > 0) {
+            moveGaze(gazeList);
+
+
+            gazeList.forEach(
+              function (eye) {
+                image_data = drawer.drawRectangle(
+                    image_data,
+                    eye.eyeData.getHaarRectangle(),
+                    eye.eyeData.getHaarRectangle().width,
+                    eye.eyeData.getHaarRectangle().height,
+                    5,
+                    "blue"
+                );
+
+
+                // draws the gaze
+                image_data = drawer.drawLine(
+                  image_data,
+                  eye.centroid.unfiltered,
+                  eye.centroid.unfiltered.add(eye.gazeVector),
+                  5,
+                  "green"
+                );
+
+                window.image_data = image_data;
+                // draws the pupil
+                image_data = drawer.drawCircle(
+                  image_data,
+                  eye.centroid.unfiltered,
+                  5,  // radius
+                  -1, // line width (filled)
+                  "red"
+                );
+              }
+            );
+          }
+          return image_data;
+        };
+        cGaze.setFrameOperator(frameOp);
+    }
+  </script>
+</head>
+<body>
+  <canvas id="mainCanvas" style= "display: none;"></canvas>
+  <video style="display: none;" autoplay></video>
+  <div id="the-eye" style="border: 2px solid black; background-color: black; height: 20px; width: 20px; display:block; position:absolute; top: 0px;"></div>
+</body>
+</html>
