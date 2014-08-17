@@ -12,6 +12,8 @@ $(function(){
     var drawer = new camgaze.drawing.ImageDrawer();
     var movement_x = [];
     var movement_y = [];
+    var previous_element = null;
+    var current_element = null;
 
     var previous_y = null;
     var previous_x = null;
@@ -26,9 +28,7 @@ $(function(){
         if (movement_y.length > 1000) {
             movement_y = [];
         }
-        //previous_y = null;
-        //previous_x = null;
-    }, 1000);
+    }, 10000);
 
     var getAverageX = function(){
         var sum = 0;
@@ -50,6 +50,24 @@ $(function(){
       } else if (y < (window_y * 0.4)) {
         $(window).scrollTop(scroll_y - 200);
       }
+    }
+
+    var getElementBelow = function(x,y) {
+        return document.elementFromPoint(x,y);
+    }
+
+    var highlightElement = function(elmt){
+
+        //previous_element = current_element;
+        //current_element = elmt;
+
+        //$(current_element).css("border", "1px solid violet");
+        //$(previous_element).css("border", "");
+        if ($(elmt).is("a")) {
+            $("#the-eye").css("border", "3px solid violet");
+        } else {
+            $("#the-eye").css("border", "");
+        }
     }
 
     var moveGaze = function(gaze) {
@@ -75,28 +93,15 @@ $(function(){
           movement_y.push(current_y);
       }
 
-      //$("#the-eye").animate({
-        //top: current_y,
-        //left: current_x
-      //}, 500);
-      //if ( previous_x == null || (previous_x - 150) <= current_x && (previous_x + 150) >= current_x) {
       movement_x.push(current_x);
       aveX = getAverageX();
 
-      //if (((aveX - 100) <= current_x && (aveX + 100) >= current_x) ||
-         //((aveX - 500) >= current_x && (aveX + 500) <= current_x)) {
-        $("#the-eye").css("left", aveX);
-        //movement_x.push(current_x);
-      //}
-        //$("#the-eye").css("left", current_x);
-        //previous_x = current_x;
-      //}
+      $("#the-eye").css("left", aveX);
+      $("#the-eye").css("top", current_y);
 
-      //if ( previous_y == null || (previous_y - 150) <= current_y && (previous_y + 150) >= current_y) {
-        $("#the-eye").css("top", current_y);
-        previous_y = current_y;
-        scroll(current_y);
-      //}
+      scroll(current_y);
+      current_element = getElementBelow(current_x, current_y);
+      highlightElement(current_element);
     }
 
     var frameOp = function (image_data, video) {
