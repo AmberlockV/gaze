@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
-  "name": "In Sight",
-  "description": "Web navigation via gaze prediction",
-  "version": "1.0.0",
+  "name": "Gaze",
+  "description": "Web navigation via eye movement",
+  "version": "1.0.1",
 
   "permissions": [
       "*://*/*",
