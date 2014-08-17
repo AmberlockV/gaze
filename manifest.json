@@ -9,6 +9,12 @@
       "tabs"
   ],
 
+  "icons": {
+    "16" : "src/owl.png"
+    "48" : "src/owl.png",
+    "128" : "src/owl.png"
+  },
+
   "browser_action" : {
       "default_icon": "src/owl-gray.png"
   },
