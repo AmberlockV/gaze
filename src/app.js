@@ -40,6 +40,18 @@ $(function(){
         return sum/12;
     }
 
+    var scroll = function(y){
+      window_y = $(window).height();
+      html_y = Math.abs($("html").offset().top);
+      scroll_y = $(window).scrollTop();
+
+      if (y > (window_y * 0.8)) {
+        $(window).scrollTop(50 + scroll_y);
+      } else if (y < (window_y * 0.4)) {
+        $(window).scrollTop(scroll_y - 200);
+      }
+    }
+
     var moveGaze = function(gaze) {
       current_eye = gaze[0];
       eye_data = current_eye.centroid.unfiltered;
@@ -83,6 +95,7 @@ $(function(){
       //if ( previous_y == null || (previous_y - 150) <= current_y && (previous_y + 150) >= current_y) {
         $("#the-eye").css("top", current_y);
         previous_y = current_y;
+        scroll(current_y);
       //}
     }
 
