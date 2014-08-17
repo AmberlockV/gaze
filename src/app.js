@@ -15,9 +15,8 @@ $(function(){
     var previous_element = null;
     var current_element = null;
 
-    var previous_y = null;
-    var previous_x = null;
     var move = true;
+    var previous_elements = [];
 
     var recur = setInterval(function(){
         move = true;
@@ -28,6 +27,8 @@ $(function(){
         if (movement_y.length > 1000) {
             movement_y = [];
         }
+
+        prevous_elements = [];
     }, 10000);
 
     var getAverageX = function(){
@@ -57,16 +58,40 @@ $(function(){
     }
 
     var highlightElement = function(elmt){
-
-        //previous_element = current_element;
-        //current_element = elmt;
-
-        //$(current_element).css("border", "1px solid violet");
-        //$(previous_element).css("border", "");
         if ($(elmt).is("a")) {
             $("#the-eye").css("border", "3px solid violet");
         } else {
             $("#the-eye").css("border", "");
+        }
+    }
+
+    var stare = function(elmt){
+        var value = true;
+        var counter = 0;
+        var last_elements = previous_elements.slice(Math.max(previous_elements.length - 15, 1));
+
+        if (last_elements.length >= 15) {
+            last_elements.forEach(function(prev){
+                if (prev != elmt){
+                    counter = counter + 1;
+                }
+            });
+        } else {
+            value = false;
+        }
+
+        if (counter > 6) {
+            value = false;
+        }
+
+        return value;
+    }
+
+    var followLink = function(elmt){
+        previous_elements.push(elmt);
+
+        if ($(elmt).is("a") && stare(elmt)) {
+            $(elmt)[0].click();
         }
     }
 
@@ -102,6 +127,8 @@ $(function(){
       scroll(current_y);
       current_element = getElementBelow(current_x, current_y);
       highlightElement(current_element);
+
+      followLink(current_element);
     }
 
     var frameOp = function (image_data, video) {
@@ -109,50 +136,41 @@ $(function(){
 
       var gazeList = eyeFilter.getFilteredGaze(trackingData);
 
-                // new HAAR.Detector(haarcascade_frontalface_alt, Parallel)
-                //                     .image(image_data) // use the image
-                //                     .interval(30) // set detection interval for asynchronous detection (if not parallel)
-                //                     .complete(function(){  // onComplete callback
-                //                         console.log(this.Selection, this.objects);
-                //                         alert(l+" Objects found");
-                //                     })
-                //                     .detect(1, 1.25, 0.1, 1, true); // go
-
       if (trackingData.eyeList.length > 0) {
         moveGaze(gazeList);
 
-        gazeList.forEach(
-          function (eye) {
-            image_data = drawer.drawRectangle(
-                image_data,
-                eye.eyeData.getHaarRectangle(),
-                eye.eyeData.getHaarRectangle().width,
-                eye.eyeData.getHaarRectangle().height,
-                5,
-                "blue"
-            );
+        //gazeList.forEach(
+          //function (eye) {
+            //image_data = drawer.drawRectangle(
+                //image_data,
+                //eye.eyeData.getHaarRectangle(),
+                //eye.eyeData.getHaarRectangle().width,
+                //eye.eyeData.getHaarRectangle().height,
+                //5,
+                //"blue"
+            //);
 
 
-            // draws the gaze
-            image_data = drawer.drawLine(
-              image_data,
-              eye.centroid.unfiltered,
-              eye.centroid.unfiltered.add(eye.gazeVector),
-              5,
-              "green"
-            );
+            //// draws the gaze
+            //image_data = drawer.drawLine(
+              //image_data,
+              //eye.centroid.unfiltered,
+              //eye.centroid.unfiltered.add(eye.gazeVector),
+              //5,
+              //"green"
+            //);
 
-            window.image_data = image_data;
-            // draws the pupil
-            image_data = drawer.drawCircle(
-              image_data,
-              eye.centroid.unfiltered,
-              5,  // radius
-              -1, // line width (filled)
-              "red"
-            );
-          }
-        );
+            //window.image_data = image_data;
+            //// draws the pupil
+            //image_data = drawer.drawCircle(
+              //image_data,
+              //eye.centroid.unfiltered,
+              //5,  // radius
+              //-1, // line width (filled)
+              //"red"
+            //);
+          //}
+        //);
       }
       return image_data;
     };
