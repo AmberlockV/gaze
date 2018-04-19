@@ -5,7 +5,7 @@ $(function(){
     var cGaze = new camgaze.Camgaze(
       width,
       height,
-      "mainCanvas"
+      "mainCanvasForReal"
     );
     var eyeTracker = new camgaze.EyeTracker(width, height);
     var eyeFilter = new camgaze.EyeFilter();
